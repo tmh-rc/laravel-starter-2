@@ -1,0 +1,40 @@
+name: Formatter
+on:
+  push:
+    branches:
+    - 'feature/**'
+  pull_request:
+    branches:
+    - 'feature/**'
+jobs:
+  Formatter:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: shivammathur/setup-php@15c43e89cdef867065b0213be354c2841860869e
+        with:
+          php-version: "8.2"
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+      - name: Install Dependencies
+        run: |
+          cd src
+          composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+          npm install
+
+      - name: Format
+        run: |
+          cd src
+          vendor/bin/pint --config pint.json
+          npx prettier --write resources/js/**/*.{js,jsx} --config .prettierrc
+          npx prettier --write resources/css/**/*.css --config .prettierrc
+          npx blade-formatter --write resources/views/**/*.blade.php --config .bladeformatterrc.json
+          npx blade-formatter --write resources/views/*.blade.php --config .bladeformatterrc.json
+# find . -type f -name "*.blade.php" -exec node_modules/.bin/blade-formatter --write {} --config .bladeformatterrc.json \;
+
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Formatted
+          skip_fetch: true

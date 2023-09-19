@@ -1,0 +1,14 @@
+#!/bin/sh
+
+rm src/README.md
+
+echo "Install Laravel"
+cd src
+composer create-project laravel/laravel .
+
+echo "Copy config files"
+cd ..
+cp formatter/. src/. -r
+
+echo "Prepare pre-commit"
+cp src/pre-commit .git/hooks/pre-commit

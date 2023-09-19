@@ -1,0 +1,1 @@
+Delete this file. Install Laravel here.
